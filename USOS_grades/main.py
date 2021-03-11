@@ -1,3 +1,5 @@
+import os
+
 from selenium import webdriver
 from Database import *
 import re
@@ -5,14 +7,11 @@ option = webdriver.ChromeOptions()
 option.add_argument('headless')
 driver = webdriver.Chrome('chromedriver', options=option)
 
-class class_info():
+class Class_info():
 
-    def __init__(self, name = null, wyk = null, cw = null, lab = null, pp = null):
-        self.Name = name
-        self.WYK = wyk
-        self.CW = cw
-        self.LAB = lab
-        self.PP = pp
+    def __init__(self, info = null, gardes = null):
+        self.info = info
+        self.gardes = grades
 
 
 def login():
@@ -29,18 +28,38 @@ def read_class_names(semester):
     class_names = re.findall(r'tabindex="0"><span>(.+)</span></a>', class_table_source)
     for name in class_names:
         insert_class(name, semester)
+    return class_names
 
+
+def save_to_data(class_names, names, grades):
+    list = []
+    pom = ()
+    j = 0
+    for i in range(len(names)):
+        if names[i] in class_names:
+            list.append(pom)
+            pom = (names[i], )
+            if (i<len(names)-1) & (names[i+1] in class_names):
+                grade = {names[i]: grades[j]}
+                pom += (grade,)
+                j += 1
+        else:
+            grade = {names[i]: grades[j]}
+            pom += (grade,)
+            j+=1
+    print(list)
 
 
 def grades():
     driver.find_element_by_xpath("//*[@id='layout-c12-t']/div[2]/div/nav/ul/li[4]/a").click()
     driver.find_element_by_xpath("//*[@id='layout-c22a']/div/table/tbody/tr[3]/td[4]/a").click()
     list = driver.find_elements_by_xpath("//*[contains(text(),'szczegóły')]")
+    class_names = []
     licznik = 1
     for i in range(len(list)):
         list1 = driver.find_elements_by_xpath("//*[contains(text(),'szczegóły')]")
         list1[i].click()
-        read_class_names(licznik)
+        class_names += read_class_names(licznik)
         licznik+=1
         driver.back()
 
@@ -52,17 +71,16 @@ def grades():
     for i in table:
         table_h = i.get_attribute("outerHTML")
         names += re.findall(r'tabindex="0">(.+)</a>', table_h )
-        grades += re.findall(r' ">(.+)</span>', table_h )
-    # name = re.findall(r'tabindex="0">(.+)</a>', mmclass)
-    # grades = re.findall(r' ">(.+)</span>', mmclass)
-    # print(mmclass)
+        grades += ["".join(x) for x in re.findall(r'(?:\(brak ocen\)|(?:00;">(.+))|(?: ">(.+)))</span>', table_h )]
+    grades = [x if x !='' else 'brak ocen' for x in grades ]
     print(names)
     print(grades)
-    #zeby okienko sie nie pojawiało
+    save_to_data(class_names, names, grades)
     driver.close()
-    # s = "abc123AUG|GAC|UGAasdfg789"
-    # substring = re.findall("AUG(.*?)UGA", s)
+    driver.quit()
+
 
 login()
 grades()
+
 

@@ -29,3 +29,8 @@ def insert_class (class_names, semesters):
         session.add(classes)
         session.commit()
 
+
+def insert_grades(class_name, c_name, grade):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
