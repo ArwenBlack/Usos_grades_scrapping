@@ -25,7 +25,7 @@ def login():
 def read_class_names(semester):
     class_table = driver.find_element_by_xpath("//*[@id='layout-c22a']/div[2]/table[2]")
     class_table_source = class_table.get_attribute('outerHTML')
-    class_names = re.findall(r'tabindex="0"><span>(.+)</span></a>', class_table_source)
+    class_names = re.findall(r';" tabindex="0">(.+)(?<!</span>)</a>', class_table_source)
     for name in class_names:
         insert_class(name, semester)
     return class_names
@@ -37,16 +37,23 @@ def save_to_data(class_names, names, grades):
     j = 0
     for i in range(len(names)):
         if names[i] in class_names:
-            list.append(pom)
+            if pom:
+                list.append(pom)
             pom = (names[i], )
             if (i<len(names)-1) & (names[i+1] in class_names):
                 grade = {names[i]: grades[j]}
                 pom += (grade,)
                 j += 1
         else:
-            grade = {names[i]: grades[j]}
-            pom += (grade,)
+            pomka = ()
+            if grades[j].startswith("(") & grades[j].endswith(")"):
+                pomka += (grades[j],)
+                j+=1
+            pomka+=(grades[j], )
+            grade = {names[i]: pomka}
+            pom+= (grade,)
             j+=1
+    list.append(pom)
     print(list)
 
 
@@ -75,6 +82,7 @@ def grades():
     grades = [x if x !='' else 'brak ocen' for x in grades ]
     print(names)
     print(grades)
+    print(class_names)
     save_to_data(class_names, names, grades)
     driver.close()
     driver.quit()
