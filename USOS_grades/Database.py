@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from Grades import Grades
-
+import pandas as pd
 engine = create_engine('sqlite:///usos_database.db', echo=True)
 Base = declarative_base()
 
@@ -38,3 +38,8 @@ def insert_grades(grades: Grades):
                                                                                 lab=grades.LAB, pp=grades.PP)
     session.execute(ins)
     session.commit()
+
+
+def get_table():
+    df = pd.read_sql_table('class_semester', engine)
+    return df

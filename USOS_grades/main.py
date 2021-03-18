@@ -10,11 +10,10 @@ option.add_argument('headless')
 driver = webdriver.Chrome('chromedriver', options=option)
 
 
-def login():
-    driver.get(
-        'https://logowanie.wat.edu.pl/cas/login?service=https%3A%2F%2Fusos.wat.edu.pl%2Fkontroler.php%3F_action%3Dlogowaniecas%2Findex&locale=pl')
-    driver.find_element_by_id('username').send_keys('')
-    driver.find_element_by_id('password').send_keys('')
+def login(url, name, password):
+    driver.get(url)
+    driver.find_element_by_id('username').send_keys(name)
+    driver.find_element_by_id('password').send_keys(password)
     driver.find_element_by_name('submit').click()
 
 
@@ -120,9 +119,9 @@ def grades():
     driver.quit()
 
 
-
-login()
-grades()
+def to_account(url, name, password):
+    login(url, name, password)
+    grades()
 
 
 
